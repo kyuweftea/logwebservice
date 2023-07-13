@@ -1,0 +1,2 @@
+# logwebservice
+Retrieves host logs
