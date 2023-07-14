@@ -88,18 +88,11 @@ router.get('/*', async (req, res, next) => {
       return;
     }
 
-    res.status('404');
+    res.status(404);
     res.json({});
   
   } catch (err) {
-
-    if (err.code == 'ENOENT') {
-        res.status('404');
-      } else {
-        res.status('500');
-      }
-      
-      res.json(err);
+    next(err);
   };
 
 });
