@@ -1,7 +1,7 @@
-var express = require('express');
-var fs = require('fs/promises');
+const express = require('express');
+const fs = require('fs/promises');
 
-var router = express.Router();
+const router = express.Router();
 
 
 class CircularQueueNonBlocking {
@@ -39,27 +39,28 @@ class CircularQueueNonBlocking {
 }
 
 
-/* GET home page. */
+/* GET /var/log directory and log file info. */
 router.get('/*', async (req, res, next) => {
 
   const resourcePrefix = '/varlog';
-  let reqpathfull = resourcePrefix + req.path;
-  let fsPath = '/var/log' + req.path;
+  const reqpathfull = resourcePrefix + req.path;
+  const fsPath = '/var/log' + req.path;
 
   try {
 
-    let stats = await fs.lstat(fsPath);
+    const stats = await fs.lstat(fsPath);
 
     if (stats.isDirectory()) {
-      let files = await fs.readdir(fsPath, { withFileTypes: true });
+      const files = await fs.readdir(fsPath, { withFileTypes: true });
     
-      let logfiles = files.filter(file => file.isFile() && file.name.endsWith('log'));
-      let subdirs = files.filter(file => file.isDirectory());
+      const logfiles = files.filter(file => file.isFile() && file.name.endsWith('log'));
+      const subdirs = files.filter(file => file.isDirectory());
     
       res.json({
         logfiles: logfiles.map(logfile => ({ resource: reqpathfull + logfile.name })),
         subdirs: subdirs.map(subdir => ({ resource: reqpathfull + subdir.name }))
       });
+
       return;
     }
 
@@ -67,9 +68,12 @@ router.get('/*', async (req, res, next) => {
 
       const filehandle = await fs.open(fsPath);
 
-      let circularqueue = new CircularQueueNonBlocking(10);
+      const circularqueue = new CircularQueueNonBlocking(req.query.max_line_count ?? 10);
+      const filterregex = new RegExp(req.query.filter_regex ?? ".*")
       for await (const line of filehandle.readLines()) {
-        circularqueue.enqueue(line);
+        if (filterregex.test(line)) {
+          circularqueue.enqueue(line);
+        }
       }
 
       let lines = Array(circularqueue.size);
@@ -77,9 +81,11 @@ router.get('/*', async (req, res, next) => {
         lines[i] = circularqueue.dequeue();
       }
 
-      res.json({lines: lines});
+      res.json({
+        lines: lines
+      });
       
-      return
+      return;
     }
 
     res.status('404');
