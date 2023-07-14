@@ -1,5 +1,6 @@
 const express = require('express');
 const fs = require('fs/promises');
+const path = require('path');
 
 const router = express.Router();
 
@@ -42,9 +43,8 @@ class CircularQueueNonBlocking {
 /* GET /var/log directory and log file info. */
 router.get('/*', async (req, res, next) => {
 
-  const resourcePrefix = '/varlog';
-  const reqpathfull = resourcePrefix + req.path;
-  const fsPath = '/var/log' + req.path;
+  const reqpathfull = path.join('/varlog', req.path);
+  const fsPath = path.join('/var/log', req.path);
 
   try {
 
@@ -53,12 +53,12 @@ router.get('/*', async (req, res, next) => {
     if (stats.isDirectory()) {
       const files = await fs.readdir(fsPath, { withFileTypes: true });
     
-      const logfiles = files.filter(file => file.isFile() && file.name.endsWith('log'));
+      const logfiles = files.filter(file => file.isFile());
       const subdirs = files.filter(file => file.isDirectory());
     
       res.json({
-        logfiles: logfiles.map(logfile => ({ resource: reqpathfull + logfile.name })),
-        subdirs: subdirs.map(subdir => ({ resource: reqpathfull + subdir.name }))
+        logfiles: logfiles.map(logfile => ({ resource: path.join(reqpathfull, logfile.name) })),
+        subdirs: subdirs.map(subdir => ({ resource: path.join(reqpathfull, subdir.name) }))
       });
 
       return;
