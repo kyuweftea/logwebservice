@@ -2,45 +2,12 @@ const express = require('express');
 const fs = require('fs/promises');
 const path = require('path');
 
+const CircularQueueNonBlocking = require('../helper/circular_queue_non_blocking');
+
+
 const router = express.Router();
 
-
-class CircularQueueNonBlocking {
-  constructor(capacity) {
-    this.capacity = capacity;
-    this.storage = Array(capacity);
-    this.head = 0;
-    this.tail = 0;
-    this.size = 0;
-  }
-
-  enqueue(elem) {
-    this.storage[this.tail] = elem;
-    this.tail = (this.tail + 1) % this.capacity;
-
-    if (this.capacity == this.size) {
-      this.head = (this.head + 1) % this.capacity;
-    } else {
-      this.size++;
-    }
-  }
-
-  dequeue() {
-    if (this.size == 0) {
-        throw new Error("circular queue is empty");
-    }
-
-    let elem = this.storage[this.head];
-    this.head = (this.head + 1) % this.capacity;
-    this.size--;
-
-    return elem;
-  }
-
-}
-
-
-/* GET /var/log directory and log file info. */
+/* GET /var/log file and directory info. */
 router.get('/*', async (req, res, next) => {
 
   const reqpathfull = path.join('/varlog', req.path);
