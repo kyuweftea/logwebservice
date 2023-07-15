@@ -17,6 +17,13 @@ This package is a proof-of-concept for a web service that provides access to fil
 3. The response contains links to files and directories contained under the hosts's `/var/log`. Click on the links to open a new postman tab pre-populated with a GET request to that resource. Requests to directories will respond with their contents, and requests to files will respond with their last 10 lines by default.
 4. Add query params to customize the log file lines in the response. Increase the maximum number of lines returned by specifying an integer for `max_line_count`, and filter the lines by specifying a regex for `filter_regex`. See examples below.
 
+## Future work
+
+- access control
+- pagination
+- configuration for which files to expose
+- browser UI
+
 ## Examples
 
 ### Get contents of `/var/log`
