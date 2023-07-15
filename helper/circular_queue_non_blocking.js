@@ -1,3 +1,5 @@
+
+/* A FIFO queue that efficiently removes its oldest elements when at capacity. */
 module.exports = class CircularQueueNonBlocking {
 
   constructor(capacity) {
