@@ -1,4 +1,4 @@
-> :warning: Running this app exposes the host's filesystem under '/var/log' to the network!
+> :warning: Running this app exposes the host's filesystem under '/var/log' to the network with no encryption! Please take necessary precautions!
 
 # logwebservice
 This package is a proof-of-concept for a web service that provides access to files under the host's `/var/log` directory.
@@ -20,6 +20,7 @@ This package is a proof-of-concept for a web service that provides access to fil
 ## Future work
 
 - access control
+- SSL
 - pagination
 - configuration for which files to expose
 - browser UI
