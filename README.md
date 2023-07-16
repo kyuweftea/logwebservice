@@ -13,9 +13,9 @@ This package is a proof-of-concept for a web service that provides access to fil
 [Postman](https://www.postman.com/) is the recommended way to send requests to the app, though any method of sending HTTP GET requests and showing the JSON responses will suffice.
 
 1. Download [Postman](https://www.postman.com/)
-2. Send a GET request with a URL like `http://localhost:3000/varlog/` (if sending a request to a different machine, replace `localhost` with its IP address)
+2. Send an HTTP GET request with a URL like `http://localhost:3000/varlog/` (if sending a request to a different machine, replace `localhost` with its IP address)
 3. The response contains links to files and directories contained under the hosts's `/var/log`. Click on the links to open a new postman tab pre-populated with a GET request to that resource. Requests to directories will respond with their contents, and requests to files will respond with their last 10 lines by default.
-4. Add query params to customize the log file lines in the response. Increase the maximum number of lines returned by specifying an integer for `max_line_count`, and filter the lines by specifying a regex for `filter_regex`. See examples below.
+4. Add query params to customize the log file lines in the response. Increase the maximum number of lines returned by specifying an integer for `max_line_count`, and filter the lines by specifying a regex (represented as a URL-encoded string) for `filter_regex`. See examples below.
 
 ## Future work
 
@@ -91,6 +91,8 @@ This package is a proof-of-concept for a web service that provides access to fil
 ### Limit line count to 3
 #### Request
 `GET http://localhost:3000/varlog/install.log?max_line_count=3`
+
+If `max_line_count` is not specified, the default value is `10`.
 #### Response
 ```
 {
@@ -105,6 +107,8 @@ This package is a proof-of-concept for a web service that provides access to fil
 ### Filter lines
 #### Request
 `GET http://localhost:3000/varlog/install.log?filter_regex=will%20power%20on`
+
+The app will decode the URL-encoded string `will%20power%20on` to `"will power on"`, and then interpret it as a regular expression `/will power on/`, and only lines containing substrings that match the expression will be shown. If `filter_regex` is not specified, the default regex is `/.*/`, which any string matches.
 #### Response
 ```
 {
